@@ -119,7 +119,7 @@ public class EventLogController {
     query.addCriteria((Criteria.where("block_timestamp").gte(since_timestamp)));
 
     if (blocknum > 0)
-      query.addCriteria((Criteria.where("block_number").gte(blocknum)));
+      query.addCriteria((Criteria.where("blockNumber").gte(blocknum)));
 
     try {
       JSONObject res = JSONObject.parseObject(allRequestParams.get("result"));
