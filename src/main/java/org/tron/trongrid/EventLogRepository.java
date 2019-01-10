@@ -28,7 +28,7 @@ public interface EventLogRepository extends MongoRepository<EventLogEntity, Stri
   @Query(QueryFactory.findByContractAndEventSinceTimestamp)
   List<EventLogEntity> findByContractAndEventSinceTimestamp(String contractAddress, String eventName, Long timestamp, Pageable pageable);
 
-  @Query("{ '$or' : [ {'block_timestamp' : ?0}, {'block_timestamp' : {$gt : ?0}} ], 'resource_Node' : {$exists : true} }")
+  @Query("{ '$or' : [ {'timeStamp' : ?0}, {'timeStamp' : {$gt : ?0}} ], 'resource_Node' : {$exists : true} }")
     // return all event triggered after a certain timestamp
   List<EventLogEntity> findByBlockTimestampGreaterThan(Long timestamp,  Pageable pageable);
 

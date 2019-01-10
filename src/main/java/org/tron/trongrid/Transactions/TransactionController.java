@@ -1,6 +1,8 @@
 package org.tron.trongrid.Transactions;
 
 import com.alibaba.fastjson.JSONObject;
+import java.util.HashMap;
+import java.util.Map;
 import org.springframework.data.domain.Pageable;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +16,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import org.tron.trongrid.BlockTriggerEntity;
 import org.tron.trongrid.QueryFactory;
+import org.tron.trongrid.TransactionTriggerEntity;
 
 @RestController
 @Component
@@ -32,7 +35,7 @@ public class TransactionController {
     MongoTemplate mongoTemplate;
 
     @RequestMapping(method = RequestMethod.GET, value = "/transactions")
-    public List<BlockTriggerEntity> getTranssactions(
+    public JSONObject getTranssactions(
       /******************* Page Parameters ****************************************************/
       @RequestParam(value="limit", required=false, defaultValue = "40" ) int limit,
       @RequestParam(value="count", required=false, defaultValue = "true" ) boolean count,
@@ -49,18 +52,28 @@ public class TransactionController {
             query.setBockNum(block);
         }
         query.setPageniate(this.setPagniateVariable(start, limit, sort));
-        List<BlockTriggerEntity> tmp = mongoTemplate.find(query.getQuery(), BlockTriggerEntity.class);
+        List<TransactionTriggerEntity> tmp = mongoTemplate.find(query.getQuery(), TransactionTriggerEntity.class);
 
-        return tmp;
+        Map map = new HashMap();
+
+        map.put("total", tmp.size());
+        map.put("data", tmp);
+        return new JSONObject(map);
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/transactions/{hash}")
     public JSONObject getTransactionbyHash(
       @PathVariable String hash
     ){
-        String url = String.format("%s/%s",this.url,hash);
-        JSONObject result = this.getResponse(url);
-        return result;
+
+        QueryFactory query = new QueryFactory();
+        query.setHashEqual(hash);
+        List<TransactionTriggerEntity> tmp = mongoTemplate.find(query.getQuery(), TransactionTriggerEntity.class);
+        if (tmp.size() == 0) return null;
+        Map map = new HashMap();
+        map.put("transaction", tmp.get(0));
+
+        return new JSONObject(map);
     }
 
     private JSONObject getResponse(String url){
