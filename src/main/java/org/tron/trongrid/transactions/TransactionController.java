@@ -29,8 +29,9 @@ public class TransactionController {
 
   @RequestMapping(method = RequestMethod.GET, value = "/totaltransactions")
   public Long totaltransaction() {
-    JSONObject result = this.getResponse(this.url);
-    return result.getLong("total");
+    QueryFactory query = new QueryFactory();
+    long number = mongoTemplate.count(query.getQuery(), TransactionTriggerEntity.class);
+    return number;
   }
 
   @Autowired(required = false)
