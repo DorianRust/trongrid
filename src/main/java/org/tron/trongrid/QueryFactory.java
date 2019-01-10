@@ -81,11 +81,7 @@ public class QueryFactory {
     public void setEventName (String event) {
         this.query.addCriteria(Criteria.where("event_name").is(event));
     }
-
-    public void setTxid (String txid) {
-        this.query.addCriteria(Criteria.where("transaction_id").is(txid));
-    }
-
+    
     public void setBockNum(long block){ this.query.addCriteria(Criteria.where("blockNumber").is(block)); }
 
     public String toString (){

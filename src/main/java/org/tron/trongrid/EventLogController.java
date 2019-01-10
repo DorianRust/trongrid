@@ -49,7 +49,7 @@ public class EventLogController {
   @RequestMapping(method = RequestMethod.GET, value = "/event/transaction/{transactionId}")
   public List<ContractEvenTriggerEntity> findOneByTransaction(@PathVariable String transactionId) {
     QueryFactory query = new QueryFactory();
-    query.setTxid(transactionId);
+    query.setTransactionIdEqual(transactionId);
     List<ContractEvenTriggerEntity> tmp = mongoTemplate.find(query.getQuery(),
         ContractEvenTriggerEntity.class);
     return tmp;
