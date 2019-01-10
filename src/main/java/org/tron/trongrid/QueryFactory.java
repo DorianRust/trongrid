@@ -1,5 +1,6 @@
 package org.tron.trongrid;
 
+import java.util.regex.Pattern;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -10,12 +11,12 @@ public class QueryFactory {
 
     private Query query;
 
-    public static final String findByContractAndEventSinceTimestamp = "{ 'contract_address' : ?0, " +
+    public static final String findByContractAndEventSinceTimestamp = "{ 'contractAddress' : ?0, " +
             "'event_name': ?1,  " +
             "'$or' : [ {'block_timestamp' : ?2}, {'block_timestamp' : {$gt : ?2}} ], " +
             "'resource_Node' : {$exists : true} }";
 
-    public static final String findByContractSinceTimeStamp = "{ 'contract_address' : ?0, " +
+    public static final String findByContractSinceTimeStamp = "{ 'contractAddress' : ?0, " +
             "'$or' : [ {'block_timestamp' : ?1}, {'block_timestamp' : {$gt : ?1}} ], " +
             "'resource_Node' : {$exists : true}}";
 
@@ -39,6 +40,11 @@ public class QueryFactory {
         this.query.limit(limit);
     }
 
+    public void setHashEqual(String hash) {
+        this.query.addCriteria(Criteria.where("transactionId").is(hash));
+
+    }
+
     public void setStart(long start) {
         this.query.skip(start);
     }
@@ -48,19 +54,24 @@ public class QueryFactory {
         this.query.addCriteria(Criteria.where("resource_Node").exists(true));
         this.setTimestampGreaterEqual(timestamp);
         if (blocknum > 0)
-            this.setBocknumberGreaterEqual(blocknum);
+            this.setBlocknumberGreaterEqual(blocknum);
     }
 
     public void setTimestampGreaterEqual (long timestamp) {
-        this.query.addCriteria(Criteria.where("block_timestamp").gte(timestamp));
+        this.query.addCriteria(Criteria.where("timeStamp").gte(timestamp));
     }
 
-    public void setBocknumberGreaterEqual (long blockNum) {
+    public void setBlocknumberGreaterEqual(long blockNum) {
         this.query.addCriteria(Criteria.where("blockNumber").gte(blockNum));
     }
 
+    public void likeEventSignature(String value) {
+        Pattern pattern =Pattern.compile("^.*" + value + ".*$",Pattern.CASE_INSENSITIVE);
+        this.query.addCriteria(Criteria.where("eventSignature").is(pattern));
+    }
+
     public void setContractAddress (String addr) {
-        this.query.addCriteria(Criteria.where("contract_address").is(addr));
+        this.query.addCriteria(Criteria.where("contractAddress").is(addr));
     }
 
     public void setPageniate(Pageable page){

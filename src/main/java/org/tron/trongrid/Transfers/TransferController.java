@@ -1,14 +1,23 @@
 package org.tron.trongrid.Transfers;
 
 import com.alibaba.fastjson.JSONObject;
+import java.util.List;
+import java.util.regex.Pattern;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.data.domain.ExampleMatcher;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
+import org.tron.trongrid.ContractEvenTriggerEntity;
+import org.tron.trongrid.QueryFactory;
+import org.tron.trongrid.TransactionTriggerEntity;
 
 @RestController
 @Component
@@ -18,11 +27,15 @@ public class TransferController {
     @Value("${url.transfers}")
     private String url;
 
+    @Autowired(required = false)
+    MongoTemplate mongoTemplate;
+
     @RequestMapping(method = RequestMethod.GET, value = "/totaltransfers")
     public Long totaltransfers() {
-
-        JSONObject result = this.getResponse(this.url);
-        return result.getLong("total");
+        QueryFactory query = new QueryFactory();
+        query.likeEventSignature("Transfer");
+        List<ContractEvenTriggerEntity> tmp = mongoTemplate.find(query.getQuery(), ContractEvenTriggerEntity.class);
+        return null;
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/transfers")

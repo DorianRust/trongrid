@@ -29,80 +29,83 @@ public class EventLogController {
   }
 
   @RequestMapping(method = RequestMethod.GET, value = "/events")
-  public List<EventLogEntity> events(
+  public List<ContractEvenTriggerEntity> events(
           @RequestParam(value="since", required=false, defaultValue = "0" ) long timestamp,
           @RequestParam(value="block", required=false, defaultValue = "-1" ) long blocknum,
           HttpServletRequest request) {
 
-    QueryFactory query = new QueryFactory(timestamp, blocknum);
+    QueryFactory query = new QueryFactory();
     query.setPageniate(this.setPagniateVariable(request));
-    System.out.println(query.toString());
-    List<EventLogEntity> result = mongoTemplate.find(query.getQuery(),EventLogEntity.class);
-    return result;
+    query.setBockNum(blocknum);
+    query.setTimestampGreaterEqual(timestamp);
+    List<ContractEvenTriggerEntity> tmp = mongoTemplate.find(query.getQuery(), ContractEvenTriggerEntity.class);
+
+    return tmp;
 
   }
 
   @RequestMapping(method = RequestMethod.GET, value = "/event/transaction/{transactionId}")
-  public List<EventLogEntity> findOneByTransaction(@PathVariable String transactionId) {
-    return eventLogRepository.findByTransactionId(transactionId);
+  public List<ContractEvenTriggerEntity> findOneByTransaction(@PathVariable String transactionId) {
+    QueryFactory query = new QueryFactory();
+    query.setTxid(transactionId);
+    List<ContractEvenTriggerEntity> tmp = mongoTemplate.find(query.getQuery(), ContractEvenTriggerEntity.class);
+    return tmp;
   }
 
+
   @RequestMapping(method = RequestMethod.GET, value = "/event/contract/{contractAddress}")
-  public List<EventLogEntity> findByContractAddress(@PathVariable String contractAddress,
+  public List<ContractEvenTriggerEntity> findByContractAddress(@PathVariable String contractAddress,
                                                     @RequestParam(value="since", required=false, defaultValue = "0" ) long timestamp,
                                                     @RequestParam(value="block", required=false, defaultValue = "-1" ) long blocknum,
                                                     HttpServletRequest request) {
-    QueryFactory query = new QueryFactory(timestamp, blocknum);
+    QueryFactory query = new QueryFactory();
     query.setContractAddress(contractAddress);
     query.setPageniate(this.setPagniateVariable(request));
+    query.setTimestampGreaterEqual(timestamp);
+    query.setBockNum(blocknum);
     System.out.println(query.toString());
-    List<EventLogEntity> result = mongoTemplate.find(query.getQuery(),EventLogEntity.class);
+    List<ContractEvenTriggerEntity> result = mongoTemplate.find(query.getQuery(),ContractEvenTriggerEntity.class);
     return result;
-//    return eventLogRepository.findByBlockTimestampAndContractAddressGreaterThan(timestamp, contractAddress,
-//            this.setPagniateVariable(request));
   }
 
   @RequestMapping(method = RequestMethod.GET, value = "/event/contract/{contractAddress}/{eventName}")
-  public List<EventLogEntity> findByContractAddressAndEntryName(
+  public List<ContractEvenTriggerEntity> findByContractAddressAndEntryName(
           @PathVariable String contractAddress,
           @PathVariable String eventName,
           @RequestParam(value="since", required=false, defaultValue = "0" ) long timestamp,
           @RequestParam(value="block", required=false, defaultValue = "-1" ) long blocknum,
           HttpServletRequest request) {
 
-    QueryFactory query = new QueryFactory(timestamp, blocknum);
+    QueryFactory query = new QueryFactory();
+    query.setTimestampGreaterEqual(timestamp);
+    query.setBockNum(blocknum);
     query.setContractAddress(contractAddress);
     query.setEventName(eventName);
     query.setPageniate(this.setPagniateVariable(request));
     System.out.println(query.toString());
-    List<EventLogEntity> result = mongoTemplate.find(query.getQuery(),EventLogEntity.class);
-    return result;
 
-//    return eventLogRepository.findByContractAndEventSinceTimestamp(contractAddress,
-//            eventName,
-//            timestamp,
-//            this.setPagniateVariable(request));
+    List<ContractEvenTriggerEntity> result = mongoTemplate.find(query.getQuery(),ContractEvenTriggerEntity.class);
+    return result;
   }
 
   @RequestMapping(method = RequestMethod.GET, value = "/event/contract/{contractAddress}/{eventName}/{blockNumber}")
-  public List<EventLogEntity> findByContractAddressAndEntryNameAndBlockNumber(
+  public List<ContractEvenTriggerEntity> findByContractAddressAndEntryNameAndBlockNumber(
       @PathVariable String contractAddress,
       @PathVariable String eventName,
       @PathVariable long blockNumber) {
 
     QueryFactory query = new QueryFactory();
     query.setContractAddress(contractAddress);
+    // todo eveentname
     query.setEventName(eventName);
-    System.out.println(query.toString());
-    query.setBockNum(blockNumber);
-    List<EventLogEntity> result = mongoTemplate.find(query.getQuery(),EventLogEntity.class);
-    return result;
 
-//    return eventLogRepository
-//            .findByContractAddressAndEntryNameAndBlockNumber(contractAddress, eventName, blockNumber);
+    query.setBockNum(blockNumber);
+    List<ContractEvenTriggerEntity> result = mongoTemplate.find(query.getQuery(),ContractEvenTriggerEntity.class);
+    return result;
 
   }
 
+  // todo eventname
   @RequestMapping(method = RequestMethod.GET, value = "/event/filter/contract/{contractAddress}/{eventName}")
   public List<EventLogEntity> filterevent(
           @RequestParam Map<String,String> allRequestParams,
@@ -142,18 +145,19 @@ public class EventLogController {
     return result;
   }
 
+  // change
   @RequestMapping(method = RequestMethod.GET, value = "/event/timestamp")
-  public List<EventLogEntity> findByBlockTimestampGreaterThan(
+  public List<ContractEvenTriggerEntity> findByBlockTimestampGreaterThan(
           @RequestParam(value="contract", required=false) String contract_address,
           @RequestParam(value="since", required=false, defaultValue = "0" ) Long timestamp,
           HttpServletRequest request) {
+    QueryFactory query = new QueryFactory();
+    query.setPageniate(this.setPagniateVariable(request));
+    query.setContractAddress(contract_address);
+    query.setTimestampGreaterEqual(timestamp);
+    List<ContractEvenTriggerEntity> tmp = mongoTemplate.find(query.getQuery(), ContractEvenTriggerEntity.class);
 
-    this.setPagniateVariable(request);
-
-    if (contract_address == null || contract_address.length() == 0)
-      return eventLogRepository.findByBlockTimestampGreaterThan(timestamp, this.setPagniateVariable(request));
-
-    return eventLogRepository.findByBlockTimestampAndContractAddressGreaterThan(timestamp, contract_address, this.setPagniateVariable(request));
+    return tmp;
 
   }
 
