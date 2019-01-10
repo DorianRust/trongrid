@@ -12,13 +12,13 @@ public class QueryFactory {
     private Query query;
 
     public static final String findByContractAndEventSinceTimestamp = "{ 'contractAddress' : ?0, " +
-            "'event_name': ?1,  " +
-            "'$or' : [ {'block_timestamp' : ?2}, {'block_timestamp' : {$gt : ?2}} ], " +
-            "'resource_Node' : {$exists : true} }";
+      "'event_name': ?1,  " +
+      "'$or' : [ {'block_timestamp' : ?2}, {'block_timestamp' : {$gt : ?2}} ], " +
+      "'resource_Node' : {$exists : true} }";
 
     public static final String findByContractSinceTimeStamp = "{ 'contractAddress' : ?0, " +
-            "'$or' : [ {'block_timestamp' : ?1}, {'block_timestamp' : {$gt : ?1}} ], " +
-            "'resource_Node' : {$exists : true}}";
+      "'$or' : [ {'block_timestamp' : ?1}, {'block_timestamp' : {$gt : ?1}} ], " +
+      "'resource_Node' : {$exists : true}}";
 
     public static Pageable make_pagination(int page_num, int page_size, String sort_property){
 
@@ -40,7 +40,7 @@ public class QueryFactory {
         this.query.limit(limit);
     }
 
-    public void setHashEqual(String hash) {
+    public void setTransactionIdEqual(String hash) {
         this.query.addCriteria(Criteria.where("transactionId").is(hash));
 
     }

@@ -26,8 +26,8 @@ public class TransactionTriggerEntity implements Serializable {
   @JsonProperty(value = "blockNumber")
   private long blockNumber;
 
-  @Field(value="energyUsage")
-  @JsonProperty(value="energyUsage")
+  @Field(value = "energyUsage")
+  @JsonProperty(value = "energyUsage")
   private long energyUsage;
 
   @Field(value = "energyFee")
@@ -58,8 +58,9 @@ public class TransactionTriggerEntity implements Serializable {
   @JsonProperty(value = "triggerName")
   private String triggerName;
 
-  public TransactionTriggerEntity(String transactionId, String blockHash,  long blockNumber, long energyUsage,
-    long energyFee, long originEnergyUsage, long energyUsageTotal, long netUsage, long netFee) {
+  public TransactionTriggerEntity(String transactionId, String blockHash,
+      long blockNumber, long energyUsage, long energyFee, long originEnergyUsage,
+      long energyUsageTotal, long netUsage, long netFee) {
     this.transactionId = transactionId;
     this.blockHash = blockHash;
     this.blockNumber = blockNumber;
