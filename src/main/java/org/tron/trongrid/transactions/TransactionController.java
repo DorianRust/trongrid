@@ -27,6 +27,9 @@ public class TransactionController {
   @Value("${url.transaction}")
   private String url;
 
+  @Autowired(required = false)
+  MongoTemplate mongoTemplate;
+
   @RequestMapping(method = RequestMethod.GET, value = "/totaltransactions")
   public Long totaltransaction() {
     QueryFactory query = new QueryFactory();
@@ -34,16 +37,13 @@ public class TransactionController {
     return number;
   }
 
-  @Autowired(required = false)
-  MongoTemplate mongoTemplate;
-
   @RequestMapping(method = RequestMethod.GET, value = "/transactions")
   public JSONObject getTranssactions(
       /******************* Page Parameters ****************************************************/
       @RequestParam(value = "limit", required = false, defaultValue = "40") int limit,
       @RequestParam(value = "count", required = false, defaultValue = "true") boolean count,
       @RequestParam(value = "sort", required = false, defaultValue = "-timestamp") String sort,
-      @RequestParam(value = "start", required = false, defaultValue = "0") Long start,
+      @RequestParam(value = "start", required = false, defaultValue = "0") int start,
       @RequestParam(value = "total", required = false, defaultValue = "0") Long total,
       /****************** Filter parameters *****************************************************/
       @RequestParam(value = "block", required = false, defaultValue = "-1") long block
@@ -56,8 +56,10 @@ public class TransactionController {
     List<TransactionTriggerEntity> tmp = mongoTemplate.find(query.getQuery(),
         TransactionTriggerEntity.class);
     Map map = new HashMap();
+    if (count) {
+      map.put("total", tmp.size());
+    }
 
-    map.put("total", tmp.size());
     map.put("data", tmp);
     return new JSONObject(map);
   }
@@ -78,12 +80,6 @@ public class TransactionController {
     map.put("transaction", tmp.get(0));
 
     return new JSONObject(map);
-  }
-
-  private JSONObject getResponse(String url) {
-    System.out.println(url);
-    RestTemplate restTemplate = new RestTemplate();
-    return JSON.parseObject(restTemplate.getForObject(url, String.class));
   }
 
   private Pageable setPagniateVariable(long start, int size, String sort) {
