@@ -46,7 +46,7 @@ public class TransferController {
     QueryFactory query = new QueryFactory();
     query.likeEventSignature("Transfer");
     query.setContractAddress(address);
-    return new Long(mongoTemplate.find(query.getQuery(), ContractEvenTriggerEntity.class).size());
+    return new Long(mongoTemplate.count(query.getQuery(), ContractEvenTriggerEntity.class));
   }
 
 
