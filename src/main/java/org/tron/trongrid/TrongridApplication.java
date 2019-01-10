@@ -1,7 +1,14 @@
 package org.tron.trongrid;
 
 import com.mongodb.MongoClient;
+import com.mongodb.MongoClientOptions;
+import com.mongodb.MongoCredential;
+import com.mongodb.ServerAddress;
+import java.util.ArrayList;
+import java.util.List;
 import org.apache.catalina.connector.Connector;
+import org.omg.CORBA.Environment;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.embedded.tomcat.TomcatConnectorCustomizer;
@@ -13,6 +20,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @SpringBootApplication
 public class TrongridApplication {
@@ -36,8 +44,25 @@ public class TrongridApplication {
 	}
 
 	@Bean
-	public MongoTemplate mongoTemplate() {
-		return new MongoTemplate(new MongoClient("127.0.0.1:27017"), "eventlog");
+	public MongoTemplate mongoTemplate(
+		@Value("${mongo.host}")String mongodbIP, @Value("${mongo.dbname}")String mongodbDBName, @Value("${mongo.connectionsPerHost}")int connectionsPerHost,
+    @Value("${mongo.threadsAllowedToBlockForConnectionMultiplier}")int threadsAllowedToBlockForConnectionMultiplier, @Value("${mongo.port}")int port,
+    @Value("${mongo.username}")String username, @Value("${mongo.password}")String password
+		) {
+    MongoClientOptions options = MongoClientOptions.builder().connectionsPerHost(connectionsPerHost)
+      .threadsAllowedToBlockForConnectionMultiplier(threadsAllowedToBlockForConnectionMultiplier).build();
+    String host = mongodbIP;
+    ServerAddress serverAddress = new ServerAddress(host, port);
+    List<ServerAddress> addrs = new ArrayList<ServerAddress>();
+    addrs.add(serverAddress);
+    MongoCredential credential = MongoCredential.createScramSha1Credential(username, mongodbDBName,
+      password.toCharArray());
+    List<MongoCredential> credentials = new ArrayList<MongoCredential>();
+    credentials.add(credential);
+    MongoClient mongo = new MongoClient(addrs, credential, options);
+
+    return new MongoTemplate(mongo, mongodbDBName);
+
 	}
 
 	@Bean
