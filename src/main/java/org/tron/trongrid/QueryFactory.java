@@ -33,7 +33,14 @@ public class QueryFactory {
 
     public QueryFactory(){
         this.query = new Query();
-        this.query.addCriteria(Criteria.where("resource_Node").exists(true));
+    }
+
+    public void setLimit(int limit) {
+        this.query.limit(limit);
+    }
+
+    public void setStart(long start) {
+        this.query.skip(start);
     }
 
     public QueryFactory(long timestamp, long blocknum){
@@ -49,7 +56,7 @@ public class QueryFactory {
     }
 
     public void setBocknumberGreaterEqual (long blockNum) {
-        this.query.addCriteria(Criteria.where("block_number").gte(blockNum));
+        this.query.addCriteria(Criteria.where("blockNumber").gte(blockNum));
     }
 
     public void setContractAddress (String addr) {
@@ -68,7 +75,7 @@ public class QueryFactory {
         this.query.addCriteria(Criteria.where("transaction_id").is(txid));
     }
 
-    public void setBockNum(long block){ this.query.addCriteria(Criteria.where("block_number").is(block)); }
+    public void setBockNum(long block){ this.query.addCriteria(Criteria.where("blockNumber").is(block)); }
 
     public String toString (){
         return this.query.toString();
