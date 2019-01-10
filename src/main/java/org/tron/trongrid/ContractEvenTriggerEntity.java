@@ -62,8 +62,10 @@ public class ContractEvenTriggerEntity {
   @JsonProperty(value = "triggerName")
   private String triggerName;
 
-  public ContractEvenTriggerEntity(String eventSignature, Map<String, String> topicMap,Map<String, String> dataMap,
-    String transactionId, String contractAddress,String callerAddress,String originAddress,String creatorAddress,Long blockNumber,String removed,long timeStamp, String triggerName) {
+  public ContractEvenTriggerEntity(String eventSignature, Map<String, String> topicMap,
+      Map<String, String> dataMap, String transactionId, String contractAddress,
+      String callerAddress, String originAddress,
+      String creatorAddress, Long blockNumber,String removed,long timeStamp, String triggerName) {
     this.eventSignature = eventSignature;
     this.topicMap = topicMap;
     this.dataMap = dataMap;

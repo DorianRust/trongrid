@@ -43,7 +43,7 @@ public class BlockTriggerEntity implements Serializable {
 
 
   public BlockTriggerEntity(long blockNumber, String blockHash,  long transactionSize,
-    List<String> transactionList, Long timeStamp,String triggerName) {
+      List<String> transactionList, Long timeStamp,String triggerName) {
     this.blockNumber = blockNumber;
     this.blockHash = blockHash;
     this.transactionSize = transactionSize;
