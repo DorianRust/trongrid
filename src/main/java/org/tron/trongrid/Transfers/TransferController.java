@@ -35,7 +35,7 @@ public class TransferController {
         QueryFactory query = new QueryFactory();
         query.likeEventSignature("Transfer");
         List<ContractEvenTriggerEntity> tmp = mongoTemplate.find(query.getQuery(), ContractEvenTriggerEntity.class);
-        return null;
+        return new Long(tmp.size());
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/transfers")
