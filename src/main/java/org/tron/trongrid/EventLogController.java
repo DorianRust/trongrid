@@ -49,7 +49,7 @@ public class EventLogController {
   @RequestMapping(method = RequestMethod.GET, value = "/event/transaction/{transactionId}")
   public List<ContractEvenTriggerEntity> findOneByTransaction(@PathVariable String transactionId) {
     QueryFactory query = new QueryFactory();
-    query.setTxid(transactionId);
+    query.setTransactionIdEqual(transactionId);
     List<ContractEvenTriggerEntity> tmp = mongoTemplate.find(query.getQuery(),
         ContractEvenTriggerEntity.class);
     return tmp;
@@ -155,7 +155,6 @@ public class EventLogController {
     return result;
   }
 
-  // change
   @RequestMapping(method = RequestMethod.GET, value = "/event/timestamp")
   public List<ContractEvenTriggerEntity> findByBlockTimestampGreaterThan(
       @RequestParam(value = "contract", required = false) String contractAddress,
@@ -192,7 +191,7 @@ public class EventLogController {
     if (request.getParameter("sort") != null && request.getParameter("sort").length() > 0) {
       sort = request.getParameter("sort");
     } else {
-      sort = "-block_timestamp";
+      sort = "-timeStamp";
     }
 
     return QueryFactory.make_pagination(Math.max(0,page - 1),Math.min(200,pageSize),sort);
