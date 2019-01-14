@@ -8,7 +8,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 @Document(collection = "contractevent")
-public class ContractEvenTriggerEntity {
+public class ContractEventTriggerEntity {
   private static final long serialVersionUID = -70777625567836430L;
 
   @Id
@@ -62,7 +62,11 @@ public class ContractEvenTriggerEntity {
   @JsonProperty(value = "triggerName")
   private String triggerName;
 
-  public ContractEvenTriggerEntity(String eventSignature, Map<String, String> topicMap,
+  public Map<String, String> getTopicMap() {
+    return topicMap;
+  }
+
+  public ContractEventTriggerEntity(String eventSignature, Map<String, String> topicMap,
       Map<String, String> dataMap, String transactionId, String contractAddress,
       String callerAddress, String originAddress,
       String creatorAddress, Long blockNumber,String removed,long timeStamp, String triggerName) {

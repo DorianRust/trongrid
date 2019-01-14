@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
-import org.tron.trongrid.ContractEvenTriggerEntity;
+import org.tron.trongrid.ContractEventTriggerEntity;
 import org.tron.trongrid.QueryFactory;
 
 
@@ -35,18 +35,17 @@ public class TransferController {
   @RequestMapping(method = RequestMethod.GET, value = "/totaltransfers")
   public Long totaltransfers() {
     QueryFactory query = new QueryFactory();
-    query.likeEventSignature("Transfer");
-    return new Long(mongoTemplate.count(query.getQuery(), ContractEvenTriggerEntity.class));
+    query.findAllTransfer("Transfer");
+    return new Long(mongoTemplate.count(query.getQuery(), ContractEventTriggerEntity.class));
   }
 
   @RequestMapping(method = RequestMethod.GET, value = "/totaltransfers/{address}")
   public Long addressTotaltransfers(
-      @RequestParam(value = "address", required = false, defaultValue = "") String address
+      @PathVariable String address
   ) {
     QueryFactory query = new QueryFactory();
-    query.likeEventSignature("Transfer");
-    query.setContractAddress(address);
-    return new Long(mongoTemplate.count(query.getQuery(), ContractEvenTriggerEntity.class));
+    query.findAllTransferByAddress(address);
+    return mongoTemplate.count(query.getQuery(), ContractEventTriggerEntity.class);
   }
 
 
@@ -90,10 +89,10 @@ public class TransferController {
       @PathVariable String hash
   ) {
     QueryFactory query = new QueryFactory();
-    query.likeEventSignature("Transfer");
-    query.setTransactionIdEqual(hash);
-    List<ContractEvenTriggerEntity> result =  mongoTemplate.find(query.getQuery(),
-        ContractEvenTriggerEntity.class);
+    query.findAllTransferByTransactionId(hash);
+
+    List<ContractEventTriggerEntity> result =  mongoTemplate.find(query.getQuery(),
+        ContractEventTriggerEntity.class);
     if (result.size() == 0) {
       return null;
     }

@@ -2,8 +2,11 @@ package org.tron.trongrid;
 
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -30,34 +33,47 @@ public class EventLogController {
     return "OK";
   }
 
+  @RequestMapping(method = RequestMethod.GET, value = "/events/topics/{topics}")
+  public List<ContractEventTriggerEntity> findByContractTopic(
+      @RequestParam(value = "since", required = false, defaultValue = "0") long timestamp,
+      @RequestParam(value = "topics", required = false, defaultValue = "") String topics
+  ) {
+    QueryFactory query = new QueryFactory();
+    query.likeTopicMap("2");
+    List<ContractEventTriggerEntity> tmp = mongoTemplate.find(query.getQuery(),
+        ContractEventTriggerEntity.class);
+    return tmp;
+  }
+
   @RequestMapping(method = RequestMethod.GET, value = "/events")
-  public List<ContractEvenTriggerEntity> events(
+  public List<ContractEventTriggerEntity> events(
       @RequestParam(value = "since", required = false, defaultValue = "0") long timestamp,
       @RequestParam(value = "block", required = false, defaultValue = "-1") long blocknum,
       HttpServletRequest request) {
 
     QueryFactory query = new QueryFactory();
     query.setPageniate(this.setPagniateVariable(request));
-    query.setBockNum(blocknum);
+    if (blocknum != -1) {
+      query.setBlockNum(blocknum);
+    }
     query.setTimestampGreaterEqual(timestamp);
-    List<ContractEvenTriggerEntity> tmp = mongoTemplate.find(query.getQuery(),
-        ContractEvenTriggerEntity.class);
+    List<ContractEventTriggerEntity> tmp = mongoTemplate.find(query.getQuery(),
+        ContractEventTriggerEntity.class);
 
     return tmp;
   }
 
   @RequestMapping(method = RequestMethod.GET, value = "/event/transaction/{transactionId}")
-  public List<ContractEvenTriggerEntity> findOneByTransaction(@PathVariable String transactionId) {
+  public List<ContractEventTriggerEntity> findOneByTransaction(@PathVariable String transactionId) {
     QueryFactory query = new QueryFactory();
     query.setTransactionIdEqual(transactionId);
-    List<ContractEvenTriggerEntity> tmp = mongoTemplate.find(query.getQuery(),
-        ContractEvenTriggerEntity.class);
+    List<ContractEventTriggerEntity> tmp = mongoTemplate.find(query.getQuery(),
+        ContractEventTriggerEntity.class);
     return tmp;
   }
 
-
-  @RequestMapping(method = RequestMethod.GET, value = "/event/contract/{contractAddress}")
-  public List<ContractEvenTriggerEntity> findByContractAddress(@PathVariable String contractAddress,
+  @RequestMapping(method = RequestMethod.GET, value = "/event/contractAddress/{contractAddress}")
+  public List<ContractEventTriggerEntity> findByContractAddress(@PathVariable String contractAddress,
       @RequestParam(value = "since", required = false, defaultValue = "0") long timestamp,
       @RequestParam(value = "block", required = false, defaultValue = "-1") long blocknum,
       HttpServletRequest request) {
@@ -65,16 +81,17 @@ public class EventLogController {
     query.setContractAddress(contractAddress);
     query.setPageniate(this.setPagniateVariable(request));
     query.setTimestampGreaterEqual(timestamp);
-    query.setBockNum(blocknum);
-    System.out.println(query.toString());
-    List<ContractEvenTriggerEntity> result = mongoTemplate.find(query.getQuery(),
-        ContractEvenTriggerEntity.class);
+    if (blocknum != -1) {
+      query.setBlockNum(blocknum);
+    }
+    List<ContractEventTriggerEntity> result = mongoTemplate.find(query.getQuery(),
+        ContractEventTriggerEntity.class);
     return result;
   }
 
   @RequestMapping(method = RequestMethod.GET,
       value = "/event/contract/{contractAddress}/{eventName}")
-  public List<ContractEvenTriggerEntity> findByContractAddressAndEntryName(
+  public List<ContractEventTriggerEntity> findByContractAddressAndEntryName(
       @PathVariable String contractAddress,
       @PathVariable String eventName,
       @RequestParam(value = "since", required = false, defaultValue = "0") long timestamp,
@@ -83,20 +100,22 @@ public class EventLogController {
 
     QueryFactory query = new QueryFactory();
     query.setTimestampGreaterEqual(timestamp);
-    query.setBockNum(blocknum);
+    if (blocknum != -1) {
+      query.setBlockNum(blocknum);
+    }
     query.setContractAddress(contractAddress);
     query.setEventName(eventName);
     query.setPageniate(this.setPagniateVariable(request));
     System.out.println(query.toString());
 
-    List<ContractEvenTriggerEntity> result = mongoTemplate.find(query.getQuery(),
-        ContractEvenTriggerEntity.class);
+    List<ContractEventTriggerEntity> result = mongoTemplate.find(query.getQuery(),
+        ContractEventTriggerEntity.class);
     return result;
   }
 
   @RequestMapping(method = RequestMethod.GET,
       value = "/event/contract/{contractAddress}/{eventName}/{blockNumber}")
-  public List<ContractEvenTriggerEntity> findByContractAddressAndEntryNameAndBlockNumber(
+  public List<ContractEventTriggerEntity> findByContractAddressAndEntryNameAndBlockNumber(
       @PathVariable String contractAddress,
       @PathVariable String eventName,
       @PathVariable long blockNumber) {
@@ -106,9 +125,12 @@ public class EventLogController {
     // todo eveentname
     query.setEventName(eventName);
 
-    query.setBockNum(blockNumber);
-    List<ContractEvenTriggerEntity> result = mongoTemplate.find(query.getQuery(),
-        ContractEvenTriggerEntity.class);
+    if (blockNumber != -1) {
+      query.setBlockNum(blockNumber);
+    }
+
+    List<ContractEventTriggerEntity> result = mongoTemplate.find(query.getQuery(),
+        ContractEventTriggerEntity.class);
     return result;
 
   }
@@ -156,7 +178,7 @@ public class EventLogController {
   }
 
   @RequestMapping(method = RequestMethod.GET, value = "/event/timestamp")
-  public List<ContractEvenTriggerEntity> findByBlockTimestampGreaterThan(
+  public List<ContractEventTriggerEntity> findByBlockTimestampGreaterThan(
       @RequestParam(value = "contract", required = false) String contractAddress,
       @RequestParam(value = "since", required = false, defaultValue = "0") Long timestamp,
       HttpServletRequest request) {
@@ -164,11 +186,30 @@ public class EventLogController {
     query.setPageniate(this.setPagniateVariable(request));
     query.setContractAddress(contractAddress);
     query.setTimestampGreaterEqual(timestamp);
-    List<ContractEvenTriggerEntity> tmp = mongoTemplate.find(query.getQuery(),
-        ContractEvenTriggerEntity.class);
-
+    List<ContractEventTriggerEntity> tmp = mongoTemplate.find(query.getQuery(),
+        ContractEventTriggerEntity.class);
     return tmp;
+  }
 
+
+  @RequestMapping(method = RequestMethod.GET, value = "/trc20/getholder/{contractAddress}")
+  public  List<String> totalholder(
+      @PathVariable String contractAddress
+  ) {
+    QueryFactory query = new QueryFactory();
+    query.findAllTransferByAddress(contractAddress);
+
+    List<ContractEventTriggerEntity> contractList = mongoTemplate.find(query.getQuery(), ContractEventTriggerEntity.class);
+    Set<String> addressSet = new HashSet<>();
+    for (ContractEventTriggerEntity contract : contractList) {
+      Map<String, String> topMap = contract.getTopicMap();
+      if (topMap.containsKey("_to") && topMap.containsKey("_from")) {
+        addressSet.add(topMap.get("_to"));
+        addressSet.add(topMap.get("_from"));
+      }
+    }
+
+    return  addressSet.stream().collect(Collectors.toList());
   }
 
   private Pageable setPagniateVariable(HttpServletRequest request) {
@@ -176,7 +217,7 @@ public class EventLogController {
     // variables for pagniate
     int page = 0;
     int pageSize = 20;
-    String sort = "-block_timestamp";
+    String sort = "-timeStamp";
 
     if (request.getParameter("page") != null && request.getParameter("page").length() > 0) {
       page = Integer.parseInt(request.getParameter("page"));
