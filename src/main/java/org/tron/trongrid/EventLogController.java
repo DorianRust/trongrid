@@ -2,6 +2,7 @@ package org.tron.trongrid;
 
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -210,6 +211,38 @@ public class EventLogController {
     }
 
     return  addressSet.stream().collect(Collectors.toList());
+  }
+
+  // only use to test
+  @RequestMapping(method = RequestMethod.GET, value = "/trc20/allAddressHolderNum")
+  public  JSONObject allHolderNumber(
+  ) {
+    QueryFactory query = new QueryFactory();
+    query.findAllTransfer("Transfer");
+
+    List<ContractEventTriggerEntity> contractList = mongoTemplate.find(query.getQuery(), ContractEventTriggerEntity.class);
+    Map<String, Set<String>> addressSet = new HashMap<String, Set<String>>();
+    for (ContractEventTriggerEntity contract : contractList) {
+      String contractAddr = contract.getContractAddress();
+      Map<String, String> topMap = contract.getTopicMap();
+      if (topMap.containsKey("_to") && topMap.containsKey("_from")) {
+        if (addressSet.containsKey(contractAddr)) {
+          addressSet.get(contractAddr).add(topMap.get("_to"));
+          addressSet.get(contractAddr).add(topMap.get("_from"));
+        } else {
+          Set<String> insert = new HashSet<String>();
+          insert.add(topMap.get("_to"));
+          insert.add(topMap.get("_from"));
+          addressSet.put(contractAddr,insert );
+        }
+      }
+    }
+
+    Map map = new HashMap();
+    for (String address : addressSet.keySet()) {
+      map.put(address, addressSet.get(address).size());
+    }
+    return new JSONObject(map);
   }
 
   private Pageable setPagniateVariable(HttpServletRequest request) {

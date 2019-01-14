@@ -66,6 +66,10 @@ public class ContractEventTriggerEntity {
     return topicMap;
   }
 
+  public String getContractAddress() {
+    return contractAddress;
+  }
+
   public ContractEventTriggerEntity(String eventSignature, Map<String, String> topicMap,
       Map<String, String> dataMap, String transactionId, String contractAddress,
       String callerAddress, String originAddress,
