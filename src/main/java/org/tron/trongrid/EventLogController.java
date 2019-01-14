@@ -2,8 +2,11 @@ package org.tron.trongrid;
 
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -190,19 +193,23 @@ public class EventLogController {
 
 
   @RequestMapping(method = RequestMethod.GET, value = "/trc20/getholder/{contractAddress}")
-  public JSONObject totalholder(
+  public  List<String> totalholder(
       @PathVariable String contractAddress
   ) {
     QueryFactory query = new QueryFactory();
-    query.setContractAddress(contractAddress);
+    query.findAllTransferByAddress(contractAddress);
 
-    List<ContractEventTriggerEntity> transactionTrigger = mongoTemplate.find(query.getQuery(), ContractEventTriggerEntity.class);
-    transactionTrigger.forEach(
-        trx -> {
-          contractEvent
-        }
-    );
-    return number;
+    List<ContractEventTriggerEntity> contractList = mongoTemplate.find(query.getQuery(), ContractEventTriggerEntity.class);
+    Set<String> addressSet = new HashSet<>();
+    for (ContractEventTriggerEntity contract : contractList) {
+      Map<String, String> topMap = contract.getTopicMap();
+      if (topMap.containsKey("_to") && topMap.containsKey("_from")) {
+        addressSet.add(topMap.get("_to"));
+        addressSet.add(topMap.get("_from"));
+      }
+    }
+
+    return  addressSet.stream().collect(Collectors.toList());
   }
 
   private Pageable setPagniateVariable(HttpServletRequest request) {

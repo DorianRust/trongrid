@@ -62,6 +62,10 @@ public class ContractEventTriggerEntity {
   @JsonProperty(value = "triggerName")
   private String triggerName;
 
+  public Map<String, String> getTopicMap() {
+    return topicMap;
+  }
+
   public ContractEventTriggerEntity(String eventSignature, Map<String, String> topicMap,
       Map<String, String> dataMap, String transactionId, String contractAddress,
       String callerAddress, String originAddress,
