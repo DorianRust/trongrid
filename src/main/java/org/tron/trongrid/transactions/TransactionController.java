@@ -38,9 +38,9 @@ public class TransactionController {
   @RequestMapping(method = RequestMethod.GET, value = "/transactions")
   public JSONObject getTranssactions(
       /******************* Page Parameters ****************************************************/
-      @RequestParam(value = "limit", required = false, defaultValue = "40") int limit,
+      @RequestParam(value = "limit", required = false, defaultValue = "25") int limit,
       @RequestParam(value = "count", required = false, defaultValue = "true") boolean count,
-      @RequestParam(value = "sort", required = false, defaultValue = "-timestamp") String sort,
+      @RequestParam(value = "sort", required = false, defaultValue = "-timeStamp") String sort,
       @RequestParam(value = "start", required = false, defaultValue = "0") int start,
       @RequestParam(value = "total", required = false, defaultValue = "0") Long total,
       /****************** Filter parameters *****************************************************/
@@ -51,14 +51,13 @@ public class TransactionController {
       query.setBlockNum(block);
     }
     query.setPageniate(this.setPagniateVariable(start, limit, sort));
-    List<TransactionTriggerEntity> tmp = mongoTemplate.find(query.getQuery(),
+    List<TransactionTriggerEntity> queryResult = mongoTemplate.find(query.getQuery(),
         TransactionTriggerEntity.class);
     Map map = new HashMap();
     if (count) {
-      map.put("total", tmp.size());
+      map.put("total", queryResult.size());
     }
-
-    map.put("data", tmp);
+    map.put("data", queryResult);
     return new JSONObject(map);
   }
 
@@ -69,19 +68,19 @@ public class TransactionController {
 
     QueryFactory query = new QueryFactory();
     query.setTransactionIdEqual(hash);
-    List<TransactionTriggerEntity> tmp = mongoTemplate.find(query.getQuery(),
+    List<TransactionTriggerEntity> queryResult = mongoTemplate.find(query.getQuery(),
         TransactionTriggerEntity.class);
-    if (tmp.size() == 0) {
+    if (queryResult.size() == 0) {
       return null;
     }
     Map map = new HashMap();
-    map.put("transaction", tmp.get(0));
+    map.put("transaction", queryResult.get(0));
 
     return new JSONObject(map);
   }
 
-  private Pageable setPagniateVariable(long start, int size, String sort) {
-    int page = Math.max(0,(int)start / size);
+  private Pageable setPagniateVariable(int start, int size, String sort) {
+    int page = start;
     int pageSize = size;
     return QueryFactory.make_pagination(Math.max(0,page - 1),Math.min(200,pageSize),sort);
   }

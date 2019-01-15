@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 import org.tron.trongrid.ContractEventTriggerEntity;
 import org.tron.trongrid.QueryFactory;
+import org.tron.trongrid.TransactionTriggerEntity;
 
 
 @RestController
@@ -35,8 +36,8 @@ public class TransferController {
   @RequestMapping(method = RequestMethod.GET, value = "/totaltransfers")
   public Long totaltransfers() {
     QueryFactory query = new QueryFactory();
-    query.findAllTransfer("Transfer");
-    return new Long(mongoTemplate.count(query.getQuery(), ContractEventTriggerEntity.class));
+    query.setTransferType();
+    return new Long(mongoTemplate.count(query.getQuery(), TransactionTriggerEntity.class));
   }
 
   @RequestMapping(method = RequestMethod.GET, value = "/totaltransfers/{address}")
@@ -45,16 +46,16 @@ public class TransferController {
   ) {
     QueryFactory query = new QueryFactory();
     query.findAllTransferByAddress(address);
-    return mongoTemplate.count(query.getQuery(), ContractEventTriggerEntity.class);
+    return mongoTemplate.count(query.getQuery(), TransactionTriggerEntity.class);
   }
 
 
   @RequestMapping(method = RequestMethod.GET, value = "/transfers")
   public JSONArray getTransfers(
       /******************* Page Parameters ****************************************************/
-      @RequestParam(value = "limit", required = false, defaultValue = "40") int limit,
+      @RequestParam(value = "limit", required = false, defaultValue = "25") int limit,
       @RequestParam(value = "count", required = false, defaultValue = "true") boolean count,
-      @RequestParam(value = "sort", required = false, defaultValue = "-timestamp") String sort,
+      @RequestParam(value = "sort", required = false, defaultValue = "-timeStamp") String sort,
       @RequestParam(value = "start", required = false, defaultValue = "0") Long start,
       @RequestParam(value = "total", required = false, defaultValue = "0") Long total,
       /****************** Filter parameters *****************************************************/
@@ -89,16 +90,15 @@ public class TransferController {
       @PathVariable String hash
   ) {
     QueryFactory query = new QueryFactory();
-    query.findAllTransferByTransactionId(hash);
-
-    List<ContractEventTriggerEntity> result =  mongoTemplate.find(query.getQuery(),
-        ContractEventTriggerEntity.class);
-    if (result.size() == 0) {
+    query.setTransactionIdEqual(hash);
+    List<TransactionTriggerEntity> queryResult = mongoTemplate.find(query.getQuery(),
+        TransactionTriggerEntity.class);
+    if (queryResult.size() == 0) {
       return null;
     }
-
     Map map = new HashMap();
-    map.put("data", result.get(0));
+
+    map.put("transaction", queryResult.get(0));
     return new JSONObject(map);
   }
 

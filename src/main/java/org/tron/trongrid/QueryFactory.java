@@ -35,17 +35,15 @@ public class QueryFactory {
     this.query = new Query();
   }
 
-  public void setLimit(int limit) {
-    this.query.limit(limit);
-  }
-
   public void setTransactionIdEqual(String hash) {
     this.query.addCriteria(Criteria.where("transactionId").is(hash));
 
   }
 
-  public void setStart(long start) {
-    this.query.skip(start);
+  public void setTransferType() {
+    Criteria criteria = new Criteria();
+    criteria.orOperator(Criteria.where("contractType").is("TransferContract"), Criteria.where("contractType").is("TransferAssetContract"));
+    this.query.addCriteria(criteria);
   }
 
   public QueryFactory(long timestamp, long blocknum){
@@ -53,20 +51,17 @@ public class QueryFactory {
     this.query.addCriteria(Criteria.where("resource_Node").exists(true));
     this.setTimestampGreaterEqual(timestamp);
     if (blocknum > 0)
-      this.setBlocknumberGreaterEqual(blocknum);
+      this.setBlockNumGte(blocknum);
   }
 
   public void setTimestampGreaterEqual (long timestamp) {
     this.query.addCriteria(Criteria.where("timeStamp").gte(timestamp));
   }
 
-  public void setBlocknumberGreaterEqual(long blockNum) {
-    this.query.addCriteria(Criteria.where("blockNumber").gte(blockNum));
-  }
-
   public void findAllTransferByAddress(String address) {
-    Pattern pattern =Pattern.compile("^.*" + "Transfer" + ".*$",Pattern.CASE_INSENSITIVE);
-    this.query.addCriteria(Criteria.where("eventSignature").is(pattern).and("contractAddress").is(address));
+    setTransferType();
+
+    this.query.addCriteria(Criteria.where("contractAddress").is(address));
   }
 
   public void findAllTransferByTransactionId(String trxId) {
@@ -94,13 +89,16 @@ public class QueryFactory {
   }
 
   public void setEventName (String event) {
-    this.query.addCriteria(Criteria.where("event_name").is(event));
+    this.query.addCriteria(Criteria.where("eventName").is(event));
   }
 
   public void setBlockNum(long block){
     this.query.addCriteria(Criteria.where("blockNumber").is(block));
   }
 
+  public void setBlockNumGte(long block){
+    this.query.addCriteria(Criteria.where("blockNumber").gte(block));
+  }
   public String toString (){
     return this.query.toString();
   }
