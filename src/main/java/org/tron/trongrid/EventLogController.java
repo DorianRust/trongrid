@@ -115,7 +115,7 @@ public class EventLogController {
       map.put("eventFunction", p.getEventSignature());
       int i = 0;
       Map<String, String> dataMap = p.getDataMap();
-      Map<String, String> topicMap = p.getDataMap();
+      Map<String, String> topicMap = p.getTopicMap();
       for (String topic : topicMap.keySet()) {
         dataMap.put(topic, topicMap.get(topic));
       }
