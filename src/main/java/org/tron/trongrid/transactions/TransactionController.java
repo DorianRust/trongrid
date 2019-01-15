@@ -51,13 +51,13 @@ public class TransactionController {
       query.setBlockNum(block);
     }
     query.setPageniate(this.setPagniateVariable(start, limit, sort));
-    List<TransactionTriggerEntity> tmp = mongoTemplate.find(query.getQuery(),
+    List<TransactionTriggerEntity> queryResult = mongoTemplate.find(query.getQuery(),
         TransactionTriggerEntity.class);
     Map map = new HashMap();
     if (count) {
-      map.put("total", tmp.size());
+      map.put("total", queryResult.size());
     }
-    map.put("data", tmp);
+    map.put("data", queryResult);
     return new JSONObject(map);
   }
 
@@ -68,13 +68,13 @@ public class TransactionController {
 
     QueryFactory query = new QueryFactory();
     query.setTransactionIdEqual(hash);
-    List<TransactionTriggerEntity> tmp = mongoTemplate.find(query.getQuery(),
+    List<TransactionTriggerEntity> queryResult = mongoTemplate.find(query.getQuery(),
         TransactionTriggerEntity.class);
-    if (tmp.size() == 0) {
+    if (queryResult.size() == 0) {
       return null;
     }
     Map map = new HashMap();
-    map.put("transaction", tmp.get(0));
+    map.put("transaction", queryResult.get(0));
 
     return new JSONObject(map);
   }

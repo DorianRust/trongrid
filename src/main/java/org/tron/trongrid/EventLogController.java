@@ -47,19 +47,19 @@ public class EventLogController {
       query.setBlockNumGte(blocknum);
     }
     query.setTimestampGreaterEqual(timestamp);
-    List<ContractEventTriggerEntity> tmp = mongoTemplate.find(query.getQuery(),
+    List<ContractEventTriggerEntity> queryResult = mongoTemplate.find(query.getQuery(),
         ContractEventTriggerEntity.class);
 
-    return tmp;
+    return queryResult;
   }
 
   @RequestMapping(method = RequestMethod.GET, value = "/event/transaction/{transactionId}")
   public List<ContractEventTriggerEntity> findOneByTransaction(@PathVariable String transactionId) {
     QueryFactory query = new QueryFactory();
     query.setTransactionIdEqual(transactionId);
-    List<ContractEventTriggerEntity> tmp = mongoTemplate.find(query.getQuery(),
+    List<ContractEventTriggerEntity> queryResult = mongoTemplate.find(query.getQuery(),
         ContractEventTriggerEntity.class);
-    return tmp;
+    return queryResult;
   }
 
   @RequestMapping(method = RequestMethod.GET, value = "/event/contractAddress/{contractAddress}")
@@ -195,9 +195,9 @@ public class EventLogController {
     query.setContractAddress(contractAddress);
     query.setTimestampGreaterEqual(timestamp);
     query.setPageniate(this.setPagniateVariable(request));
-    List<ContractEventTriggerEntity> tmp = mongoTemplate.find(query.getQuery(),
+    List<ContractEventTriggerEntity> queryResult = mongoTemplate.find(query.getQuery(),
         ContractEventTriggerEntity.class);
-    return tmp;
+    return queryResult;
   }
 
   @RequestMapping(method = RequestMethod.GET, value = "/trc20/getholder/{contractAddress}")

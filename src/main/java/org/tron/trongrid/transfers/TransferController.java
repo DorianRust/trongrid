@@ -91,14 +91,14 @@ public class TransferController {
   ) {
     QueryFactory query = new QueryFactory();
     query.setTransactionIdEqual(hash);
-    List<TransactionTriggerEntity> tmp = mongoTemplate.find(query.getQuery(),
+    List<TransactionTriggerEntity> queryResult = mongoTemplate.find(query.getQuery(),
         TransactionTriggerEntity.class);
-    if (tmp.size() == 0) {
+    if (queryResult.size() == 0) {
       return null;
     }
     Map map = new HashMap();
 
-    map.put("transaction", tmp.get(0));
+    map.put("transaction", queryResult.get(0));
     return new JSONObject(map);
   }
 
