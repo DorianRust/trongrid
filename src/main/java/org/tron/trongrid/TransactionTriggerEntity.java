@@ -103,6 +103,10 @@ public class TransactionTriggerEntity implements Serializable {
   @JsonProperty(value = "contractResult")
   private String contractResult;
 
+  public String getContractType() {
+    return contractType;
+  }
+
   public TransactionTriggerEntity(String transactionId, String blockHash,
       long blockNumber, long energyUsage, long energyFee, long originEnergyUsage,
       long energyUsageTotal, long netUsage, long netFee, List<InternalTransactionPojo> internalTrananctionList,

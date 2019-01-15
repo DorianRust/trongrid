@@ -83,6 +83,7 @@ public class TransferController {
   ) {
     QueryFactory query = new QueryFactory();
     query.setTransactionIdEqual(hash);
+    query.setTransferType();
     List<TransactionTriggerEntity> queryResult = mongoTemplate.find(query.getQuery(),
         TransactionTriggerEntity.class);
     if (queryResult.size() == 0) {

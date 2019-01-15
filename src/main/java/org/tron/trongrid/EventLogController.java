@@ -36,14 +36,17 @@ public class EventLogController {
   public List<ContractEventTriggerEntity> events(
       @RequestParam(value = "since", required = false, defaultValue = "0") long timestamp,
       @RequestParam(value = "block", required = false, defaultValue = "-1") long blocknum,
-      HttpServletRequest request) {
+      @RequestParam(value = "limit", required = false, defaultValue = "25") int limit,
+      @RequestParam(value = "sort", required = false, defaultValue = "-timeStamp") String sort,
+      @RequestParam(value = "start", required = false, defaultValue = "0") int start
+     ) {
 
     QueryFactory query = new QueryFactory();
-    query.setPageniate(this.setPagniateVariable(request));
     if (blocknum != -1) {
       query.setBlockNumGte(blocknum);
     }
     query.setTimestampGreaterEqual(timestamp);
+    query.setPageniate(QueryFactory.setPagniateVariable(start, limit, sort));
     List<ContractEventTriggerEntity> queryResult = mongoTemplate.find(query.getQuery(),
         ContractEventTriggerEntity.class);
 
@@ -63,14 +66,17 @@ public class EventLogController {
   public List<ContractEventTriggerEntity> findByContractAddress(@PathVariable String contractAddress,
       @RequestParam(value = "since", required = false, defaultValue = "0") long timestamp,
       @RequestParam(value = "block", required = false, defaultValue = "-1") long blocknum,
-      HttpServletRequest request) {
+      @RequestParam(value = "limit", required = false, defaultValue = "25") int limit,
+      @RequestParam(value = "sort", required = false, defaultValue = "-timeStamp") String sort,
+      @RequestParam(value = "start", required = false, defaultValue = "0") int start) {
     QueryFactory query = new QueryFactory();
     query.setContractAddress(contractAddress);
-    query.setPageniate(this.setPagniateVariable(request));
     query.setTimestampGreaterEqual(timestamp);
     if (blocknum != -1) {
       query.setBlockNum(blocknum);
     }
+    query.setPageniate(QueryFactory.setPagniateVariable(start, limit, sort));
+
     List<ContractEventTriggerEntity> result = mongoTemplate.find(query.getQuery(),
         ContractEventTriggerEntity.class);
     return result;
@@ -97,7 +103,8 @@ public class EventLogController {
       map.put("TxHash", p.getTransactionId());
       map.put("BlockNum", p.getBlockNumer());
       map.put("eventTime", p.getTimeStamp());
-      map.put("eventFunction", p.getEventSignature());
+      map.put("eventFunction", p.getEventSignatureFull());
+      map.put("evenName", p.getEventName());
       int i = 0;
       Map<String, String> dataMap = p.getDataMap();
       Map<String, String> topicMap = p.getTopicMap();
@@ -122,7 +129,9 @@ public class EventLogController {
       @PathVariable String eventName,
       @RequestParam(value = "since", required = false, defaultValue = "0") long timestamp,
       @RequestParam(value = "block", required = false, defaultValue = "-1") long blocknum,
-      HttpServletRequest request) {
+      @RequestParam(value = "limit", required = false, defaultValue = "25") int limit,
+      @RequestParam(value = "sort", required = false, defaultValue = "-timeStamp") String sort,
+      @RequestParam(value = "start", required = false, defaultValue = "0") int start) {
 
     QueryFactory query = new QueryFactory();
     query.setTimestampGreaterEqual(timestamp);
@@ -131,8 +140,7 @@ public class EventLogController {
     }
     query.setContractAddress(contractAddress);
     query.setEventName(eventName);
-    query.setPageniate(this.setPagniateVariable(request));
-    System.out.println(query.toString());
+    query.setPageniate(QueryFactory.setPagniateVariable(start, limit, sort));
 
     List<ContractEventTriggerEntity> result = mongoTemplate.find(query.getQuery(),
         ContractEventTriggerEntity.class);
@@ -185,13 +193,17 @@ public class EventLogController {
 
   @RequestMapping(method = RequestMethod.GET, value = "/event/timestamp")
   public List<ContractEventTriggerEntity> findByBlockTimestampGreaterThan(
-      @RequestParam(value = "contract", required = false) String contractAddress,
+      @RequestParam(value = "contract", required = false, defaultValue = "") String contractAddress,
       @RequestParam(value = "since", required = false, defaultValue = "0") Long timestamp,
-      HttpServletRequest request) {
+      @RequestParam(value = "limit", required = false, defaultValue = "25") int limit,
+      @RequestParam(value = "sort", required = false, defaultValue = "-timeStamp") String sort,
+      @RequestParam(value = "start", required = false, defaultValue = "0") int start) {
     QueryFactory query = new QueryFactory();
-    query.setContractAddress(contractAddress);
+    if (contractAddress.length() != 0) {
+      query.setContractAddress(contractAddress);
+    }
     query.setTimestampGreaterEqual(timestamp);
-    query.setPageniate(this.setPagniateVariable(request));
+    query.setPageniate(this.setPagniateVariable(limit, sort, start));
     List<ContractEventTriggerEntity> queryResult = mongoTemplate.find(query.getQuery(),
         ContractEventTriggerEntity.class);
     return queryResult;
