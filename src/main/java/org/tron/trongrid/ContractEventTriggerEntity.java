@@ -70,6 +70,24 @@ public class ContractEventTriggerEntity {
     return contractAddress;
   }
 
+  public String getTransactionId() { return transactionId; }
+
+  public Long getBlockNumer() {
+    return blockNumber;
+  }
+
+  public long getTimeStamp() {
+    return timeStamp;
+  }
+
+  public String getEventSignature() {
+    return eventSignature;
+  }
+
+  public Map<String, String> getDataMap() {
+    return dataMap;
+  }
+
   public ContractEventTriggerEntity(String eventSignature, Map<String, String> topicMap,
       Map<String, String> dataMap, String transactionId, String contractAddress,
       String callerAddress, String originAddress,

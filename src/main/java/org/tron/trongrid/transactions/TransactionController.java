@@ -81,7 +81,7 @@ public class TransactionController {
   }
 
   private Pageable setPagniateVariable(long start, int size, String sort) {
-    int page = Math.max(0,(int)start / size);
+    int page = Math.max(0,(int) start / size);
     int pageSize = size;
     return QueryFactory.make_pagination(Math.max(0,page - 1),Math.min(200,pageSize),sort);
   }

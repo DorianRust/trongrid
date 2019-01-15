@@ -2,6 +2,7 @@ package org.tron.trongrid;
 
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -88,6 +89,45 @@ public class EventLogController {
     List<ContractEventTriggerEntity> result = mongoTemplate.find(query.getQuery(),
         ContractEventTriggerEntity.class);
     return result;
+  }
+
+  // get event list
+  @RequestMapping(method = RequestMethod.GET, value = "/events/{contractAddress}")
+  public List<JSONObject> findEventsListByContractAddress
+      (@PathVariable String contractAddress,
+       @RequestParam(value = "limit", required = false, defaultValue = "40") int limit,
+       @RequestParam(value = "sort", required = false, defaultValue = "-timeStamp") String sort,
+       @RequestParam(value = "start", required = false, defaultValue = "0") int start
+      ) {
+
+    QueryFactory query = new QueryFactory();
+    query.setContractAddress(contractAddress);
+    query.setPageniate(this.setPagniateVariable(limit, sort, start));
+    List<ContractEventTriggerEntity> result = mongoTemplate.find(query.getQuery(),
+        ContractEventTriggerEntity.class);
+
+    List<JSONObject> array = new ArrayList<>();
+    for(ContractEventTriggerEntity p : result) {
+      Map map = new HashMap();
+      map.put("TxHash", p.getTransactionId());
+      map.put("BlockNum", p.getBlockNumer());
+      map.put("eventTime", p.getTimeStamp());
+      map.put("eventFunction", p.getEventSignature());
+      int i = 0;
+      Map<String, String> dataMap = p.getDataMap();
+      Map<String, String> topicMap = p.getDataMap();
+      for (String topic : topicMap.keySet()) {
+        dataMap.put(topic, topicMap.get(topic));
+      }
+
+      while (dataMap.containsKey(String.valueOf(i))) {
+        map.put(String.valueOf(i), dataMap.get(String.valueOf(i)));
+        i++;
+      }
+      array.add(new JSONObject(map));
+    }
+
+    return array;
   }
 
   @RequestMapping(method = RequestMethod.GET,
@@ -192,7 +232,6 @@ public class EventLogController {
     return tmp;
   }
 
-
   @RequestMapping(method = RequestMethod.GET, value = "/trc20/getholder/{contractAddress}")
   public  List<String> totalholder(
       @PathVariable String contractAddress
@@ -267,6 +306,16 @@ public class EventLogController {
     } else {
       sort = "-timeStamp";
     }
+
+    return QueryFactory.make_pagination(Math.max(0,page - 1),Math.min(200,pageSize),sort);
+
+  }
+
+  private Pageable setPagniateVariable(int limit, String sort, int start) {
+
+    // variables for pagniate
+    int page = start;
+    int pageSize = limit;
 
     return QueryFactory.make_pagination(Math.max(0,page - 1),Math.min(200,pageSize),sort);
 
