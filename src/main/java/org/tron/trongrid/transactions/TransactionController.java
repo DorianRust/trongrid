@@ -43,7 +43,7 @@ public class TransactionController {
   ) {
     QueryFactory query = new QueryFactory();
     if (block > 0) {
-      query.setBlockNum(block);
+      query.setBlockNumGte(block);
     }
     query.setPageniate(QueryFactory.setPagniateVariable(start, limit, sort));
     List<TransactionTriggerEntity> queryResult = mongoTemplate.find(query.getQuery(),

@@ -34,6 +34,8 @@ public class TransferController {
       @PathVariable String address
   ) {
     QueryFactory query = new QueryFactory();
+    query.setTransferType();
+
     query.findAllTransferByAddress(address);
     return mongoTemplate.count(query.getQuery(), TransactionTriggerEntity.class);
   }
@@ -90,7 +92,7 @@ public class TransferController {
       return null;
     }
     Map map = new HashMap();
-    map.put("transaction", queryResult.get(0));
+    map.put("data", queryResult.get(0));
     return new JSONObject(map);
   }
 }

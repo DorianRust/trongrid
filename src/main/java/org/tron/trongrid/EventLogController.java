@@ -73,7 +73,7 @@ public class EventLogController {
     query.setContractAddress(contractAddress);
     query.setTimestampGreaterEqual(timestamp);
     if (blocknum != -1) {
-      query.setBlockNum(blocknum);
+      query.setBlockNumGte(blocknum);
     }
     query.setPageniate(QueryFactory.setPagniateVariable(start, limit, sort));
 
@@ -136,7 +136,7 @@ public class EventLogController {
     QueryFactory query = new QueryFactory();
     query.setTimestampGreaterEqual(timestamp);
     if (blocknum != -1) {
-      query.setBlockNum(blocknum);
+      query.setBlockNumGte(blocknum);
     }
     query.setContractAddress(contractAddress);
     query.setEventName(eventName);
