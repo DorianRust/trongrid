@@ -35,18 +35,6 @@ public class EventLogController {
     return "OK";
   }
 
-  @RequestMapping(method = RequestMethod.GET, value = "/events/topics/{topics}")
-  public List<ContractEventTriggerEntity> findByContractTopic(
-      @RequestParam(value = "since", required = false, defaultValue = "0") long timestamp,
-      @RequestParam(value = "topics", required = false, defaultValue = "") String topics
-  ) {
-    QueryFactory query = new QueryFactory();
-    query.likeTopicMap("2");
-    List<ContractEventTriggerEntity> tmp = mongoTemplate.find(query.getQuery(),
-        ContractEventTriggerEntity.class);
-    return tmp;
-  }
-
   @RequestMapping(method = RequestMethod.GET, value = "/events")
   public List<ContractEventTriggerEntity> events(
       @RequestParam(value = "since", required = false, defaultValue = "0") long timestamp,
@@ -56,7 +44,7 @@ public class EventLogController {
     QueryFactory query = new QueryFactory();
     query.setPageniate(this.setPagniateVariable(request));
     if (blocknum != -1) {
-      query.setBlockNum(blocknum);
+      query.setBlockNumGte(blocknum);
     }
     query.setTimestampGreaterEqual(timestamp);
     List<ContractEventTriggerEntity> tmp = mongoTemplate.find(query.getQuery(),
@@ -95,7 +83,7 @@ public class EventLogController {
   @RequestMapping(method = RequestMethod.GET, value = "/events/{contractAddress}")
   public List<JSONObject> findEventsListByContractAddress
       (@PathVariable String contractAddress,
-       @RequestParam(value = "limit", required = false, defaultValue = "40") int limit,
+       @RequestParam(value = "limit", required = false, defaultValue = "25") int limit,
        @RequestParam(value = "sort", required = false, defaultValue = "-timeStamp") String sort,
        @RequestParam(value = "start", required = false, defaultValue = "0") int start
       ) {
@@ -163,11 +151,10 @@ public class EventLogController {
 
     QueryFactory query = new QueryFactory();
     query.setContractAddress(contractAddress);
-    // todo eveentname
     query.setEventName(eventName);
 
     if (blockNumber != -1) {
-      query.setBlockNum(blockNumber);
+      query.setBlockNumGte(blockNumber);
     }
 
     List<ContractEventTriggerEntity> result = mongoTemplate.find(query.getQuery(),
@@ -176,45 +163,26 @@ public class EventLogController {
 
   }
 
-  // todo eventname
   @RequestMapping(method = RequestMethod.GET,
       value = "/event/filter/contract/{contractAddress}/{eventName}")
-  public List<EventLogEntity> filterevent(
+  public List<ContractEventTriggerEntity> filterevent(
       @RequestParam Map<String,String> allRequestParams,
       @PathVariable String contractAddress,
       @PathVariable String eventName,
       @RequestParam(value = "since", required = false, defaultValue = "0") Long sinceTimestamp,
       @RequestParam(value = "block", required = false, defaultValue = "-1") long blocknum,
-      HttpServletRequest request) {
-    Query query = new Query();
-    query.addCriteria(Criteria.where("contract_address").is(contractAddress));
-    query.addCriteria(Criteria.where("event_name").is(eventName));
-    query.addCriteria((Criteria.where("block_timestamp").gte(sinceTimestamp)));
+      @RequestParam(value = "limit", required = false, defaultValue = "25") int limit,
+      @RequestParam(value = "sort", required = false, defaultValue = "-timeStamp") String sort,
+      @RequestParam(value = "start", required = false, defaultValue = "0") int start) {
+    QueryFactory query = new QueryFactory();
 
-    if (blocknum > 0) {
-      query.addCriteria((Criteria.where("blockNumber").gte(blocknum)));
-    }
+    query.setContractAddress(contractAddress);
+    query.setEventName(eventName);
+    query.setTimestampGreaterEqual(sinceTimestamp);
 
-    try {
-      JSONObject res = JSONObject.parseObject(allRequestParams.get("result"));
-      for (String k : res.keySet()) {
-        if (QueryFactory.isBool(res.getString(k))) {
-          query.addCriteria(Criteria.where(String.format("%s.%s", "result", k))
-              .is(Boolean.parseBoolean(res.getString(k))));
-          continue;
-        }
-        query.addCriteria(Criteria.where(String.format("%s.%s", "result", k))
-            .is((res.getString(k))));
-      }
-    } catch (JSONException e) {
-
-    } catch (java.lang.NullPointerException e) {
-
-    }
-
-    query.with(this.setPagniateVariable(request));
+    query.setPageniate(this.setPagniateVariable(limit, sort, start));
     System.out.println(query.toString());
-    List<EventLogEntity> result = mongoTemplate.find(query,EventLogEntity.class);
+    List<ContractEventTriggerEntity> result = mongoTemplate.find(query.getQuery(), ContractEventTriggerEntity.class);
     return result;
   }
 
@@ -224,9 +192,9 @@ public class EventLogController {
       @RequestParam(value = "since", required = false, defaultValue = "0") Long timestamp,
       HttpServletRequest request) {
     QueryFactory query = new QueryFactory();
-    query.setPageniate(this.setPagniateVariable(request));
     query.setContractAddress(contractAddress);
     query.setTimestampGreaterEqual(timestamp);
+    query.setPageniate(this.setPagniateVariable(request));
     List<ContractEventTriggerEntity> tmp = mongoTemplate.find(query.getQuery(),
         ContractEventTriggerEntity.class);
     return tmp;
@@ -250,38 +218,6 @@ public class EventLogController {
     }
 
     return  addressSet.stream().collect(Collectors.toList());
-  }
-
-  // only use to test
-  @RequestMapping(method = RequestMethod.GET, value = "/trc20/allAddressHolderNum")
-  public  JSONObject allHolderNumber(
-  ) {
-    QueryFactory query = new QueryFactory();
-    query.findAllTransfer("Transfer");
-
-    List<ContractEventTriggerEntity> contractList = mongoTemplate.find(query.getQuery(), ContractEventTriggerEntity.class);
-    Map<String, Set<String>> addressSet = new HashMap<String, Set<String>>();
-    for (ContractEventTriggerEntity contract : contractList) {
-      String contractAddr = contract.getContractAddress();
-      Map<String, String> topMap = contract.getTopicMap();
-      if (topMap.containsKey("_to") && topMap.containsKey("_from")) {
-        if (addressSet.containsKey(contractAddr)) {
-          addressSet.get(contractAddr).add(topMap.get("_to"));
-          addressSet.get(contractAddr).add(topMap.get("_from"));
-        } else {
-          Set<String> insert = new HashSet<String>();
-          insert.add(topMap.get("_to"));
-          insert.add(topMap.get("_from"));
-          addressSet.put(contractAddr,insert );
-        }
-      }
-    }
-
-    Map map = new HashMap();
-    for (String address : addressSet.keySet()) {
-      map.put(address, addressSet.get(address).size());
-    }
-    return new JSONObject(map);
   }
 
   private Pageable setPagniateVariable(HttpServletRequest request) {

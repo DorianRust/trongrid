@@ -38,7 +38,7 @@ public class TransactionController {
   @RequestMapping(method = RequestMethod.GET, value = "/transactions")
   public JSONObject getTranssactions(
       /******************* Page Parameters ****************************************************/
-      @RequestParam(value = "limit", required = false, defaultValue = "40") int limit,
+      @RequestParam(value = "limit", required = false, defaultValue = "25") int limit,
       @RequestParam(value = "count", required = false, defaultValue = "true") boolean count,
       @RequestParam(value = "sort", required = false, defaultValue = "-timeStamp") String sort,
       @RequestParam(value = "start", required = false, defaultValue = "0") int start,
@@ -57,7 +57,6 @@ public class TransactionController {
     if (count) {
       map.put("total", tmp.size());
     }
-
     map.put("data", tmp);
     return new JSONObject(map);
   }

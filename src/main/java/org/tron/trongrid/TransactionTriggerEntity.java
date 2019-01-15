@@ -2,6 +2,7 @@ package org.tron.trongrid;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.io.Serializable;
+import java.util.List;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
@@ -58,9 +59,22 @@ public class TransactionTriggerEntity implements Serializable {
   @JsonProperty(value = "triggerName")
   private String triggerName;
 
+  @Field(value = "internalTrananctionList")
+  @JsonProperty(value = "internalTrananctionList")
+  private List<InternalTransactionPojo> internalTrananctionList;
+
+  private String fromAddress;
+
+  private String toAddress;
+
+  private String assetName;
+
+  private long assetAmount;
+
   public TransactionTriggerEntity(String transactionId, String blockHash,
       long blockNumber, long energyUsage, long energyFee, long originEnergyUsage,
-      long energyUsageTotal, long netUsage, long netFee) {
+      long energyUsageTotal, long netUsage, long netFee, List<InternalTransactionPojo> internalTrananctionList,
+      String fromAddress, String toAddress, String assetName, long assetAmount) {
     this.transactionId = transactionId;
     this.blockHash = blockHash;
     this.blockNumber = blockNumber;
@@ -71,5 +85,10 @@ public class TransactionTriggerEntity implements Serializable {
     this.netUsage = netUsage;
     this.energyUsage = energyUsage;
     this.netFee = netFee;
+    this.internalTrananctionList = internalTrananctionList;
+    this.fromAddress = fromAddress;
+    this.toAddress = toAddress;
+    this.assetName = assetName;
+    this.assetAmount = assetAmount;
   }
 }
