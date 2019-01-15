@@ -41,7 +41,9 @@ public class QueryFactory {
   }
 
   public void setTransferType() {
-    this.query.addCriteria(Criteria.where("contractType").is("TransferContract").orOperator(Criteria.where("contractType").is("TransferAssetContract")));
+    Criteria criteria = new Criteria();
+    criteria.orOperator(Criteria.where("contractType").is("TransferContract"), Criteria.where("contractType").is("TransferAssetContract"));
+    this.query.addCriteria(criteria);
   }
 
   public QueryFactory(long timestamp, long blocknum){

@@ -62,6 +62,10 @@ public class ContractEventTriggerEntity {
   @JsonProperty(value = "triggerName")
   private String triggerName;
 
+  @Field(value = "eventSignatureFull")
+  @JsonProperty(value = "eventSignatureFull")
+  private String eventSignatureFull;
+
   public Map<String, String> getTopicMap() {
     return topicMap;
   }
@@ -91,7 +95,8 @@ public class ContractEventTriggerEntity {
   public ContractEventTriggerEntity(String eventSignature, Map<String, String> topicMap,
       Map<String, String> dataMap, String transactionId, String contractAddress,
       String callerAddress, String originAddress,
-      String creatorAddress, Long blockNumber,String removed,long timeStamp, String triggerName) {
+      String creatorAddress, Long blockNumber,String removed,long timeStamp, String triggerName,
+      String eventSignatureFull) {
     this.eventSignature = eventSignature;
     this.topicMap = topicMap;
     this.dataMap = dataMap;
@@ -104,6 +109,7 @@ public class ContractEventTriggerEntity {
     this.removed = removed;
     this.timeStamp = timeStamp;
     this.triggerName = triggerName;
+    this.eventSignatureFull = eventSignatureFull;
   }
 
 }

@@ -37,7 +37,7 @@ public class TransferController {
   public Long totaltransfers() {
     QueryFactory query = new QueryFactory();
     query.setTransferType();
-    return new Long(mongoTemplate.count(query.getQuery(), ContractEventTriggerEntity.class));
+    return new Long(mongoTemplate.count(query.getQuery(), TransactionTriggerEntity.class));
   }
 
   @RequestMapping(method = RequestMethod.GET, value = "/totaltransfers/{address}")
@@ -46,7 +46,7 @@ public class TransferController {
   ) {
     QueryFactory query = new QueryFactory();
     query.findAllTransferByAddress(address);
-    return mongoTemplate.count(query.getQuery(), ContractEventTriggerEntity.class);
+    return mongoTemplate.count(query.getQuery(), TransactionTriggerEntity.class);
   }
 
 
