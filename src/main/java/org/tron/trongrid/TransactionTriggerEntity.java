@@ -63,12 +63,20 @@ public class TransactionTriggerEntity implements Serializable {
   @JsonProperty(value = "internalTrananctionList")
   private List<InternalTransactionPojo> internalTrananctionList;
 
+  @Field(value = "fromAddress")
+  @JsonProperty(value = "fromAddress")
   private String fromAddress;
 
+  @Field(value = "toAddress")
+  @JsonProperty(value = "toAddress")
   private String toAddress;
 
+  @Field(value = "assetName")
+  @JsonProperty(value = "assetName")
   private String assetName;
 
+  @Field(value = "assetAmount")
+  @JsonProperty(value = "assetAmount")
   private long assetAmount;
 
   public TransactionTriggerEntity(String transactionId, String blockHash,
