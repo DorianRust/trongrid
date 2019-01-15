@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -46,7 +45,7 @@ public class TransactionController {
     if (block > 0) {
       query.setBlockNum(block);
     }
-    query.setPageniate(this.setPagniateVariable(start, limit, sort));
+    query.setPageniate(QueryFactory.setPagniateVariable(start, limit, sort));
     List<TransactionTriggerEntity> queryResult = mongoTemplate.find(query.getQuery(),
         TransactionTriggerEntity.class);
     Map map = new HashMap();
@@ -74,11 +73,4 @@ public class TransactionController {
 
     return new JSONObject(map);
   }
-
-  private Pageable setPagniateVariable(int start, int size, String sort) {
-    int page = start;
-    int pageSize = size;
-    return QueryFactory.make_pagination(Math.max(0,page - 1),Math.min(200,pageSize),sort);
-  }
-
 }

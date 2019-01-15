@@ -46,12 +46,16 @@ public class QueryFactory {
     this.query.addCriteria(criteria);
   }
 
-  public QueryFactory(long timestamp, long blocknum){
-    this.query = new Query();
-    this.query.addCriteria(Criteria.where("resource_Node").exists(true));
-    this.setTimestampGreaterEqual(timestamp);
-    if (blocknum > 0)
-      this.setBlockNumGte(blocknum);
+  public void setTransactionFromAddr(String fromAddr) {
+    this.query.addCriteria(Criteria.where("fromAddress").is(fromAddr));
+  }
+
+  public void setTransactionToAddr(String toAddr) {
+    this.query.addCriteria(Criteria.where("toAddress").is(toAddr));
+  }
+
+  public void setTransactionToken(String token) {
+    this.query.addCriteria(Criteria.where("assetName").is(token));
   }
 
   public void setTimestampGreaterEqual (long timestamp) {
@@ -105,4 +109,9 @@ public class QueryFactory {
 
   public Query getQuery() { return this.query; }
 
+  public static Pageable setPagniateVariable(int start, int size, String sort) {
+    int page = start;
+    int pageSize = size;
+    return make_pagination(Math.max(0,page - 1),Math.min(200,pageSize),sort);
+  }
 }

@@ -38,6 +38,45 @@ public class TransferController {
     return mongoTemplate.count(query.getQuery(), TransactionTriggerEntity.class);
   }
 
+  @RequestMapping(method = RequestMethod.GET, value = "/transfers")
+  public JSONObject getTransfers(
+      /******************* Page Parameters ****************************************************/
+      @RequestParam(value = "limit", required = false, defaultValue = "25") int limit,
+      @RequestParam(value = "count", required = false, defaultValue = "true") boolean count,
+      @RequestParam(value = "sort", required = false, defaultValue = "-timeStamp") String sort,
+      @RequestParam(value = "start", required = false, defaultValue = "0") int start,
+      /****************** Filter parameters *****************************************************/
+      @RequestParam(value = "from", required = false, defaultValue = "") String from,
+      @RequestParam(value = "to", required = false, defaultValue = "") String to,
+      @RequestParam(value = "token", required = false, defaultValue = "") String token
+
+  ) {
+    QueryFactory query = new QueryFactory();
+    query.setTransferType();
+    if (from.length() != 0) {
+      query.setTransactionFromAddr(from);
+    }
+
+    if (to.length() != 0) {
+      query.setTransactionToAddr(to);
+    }
+
+    if (token.length() != 0) {
+      query.setTransactionToken(token);
+    }
+
+    query.setPageniate(QueryFactory.setPagniateVariable(start, limit, sort));
+
+    List<TransactionTriggerEntity> queryResult = mongoTemplate.find(query.getQuery(), TransactionTriggerEntity.class);
+    Map map = new HashMap();
+    map.put("data", queryResult);
+    if (count == true) {
+      map.put("result", queryResult.size());
+    }
+
+    return new JSONObject(map);
+  }
+
   @RequestMapping(method = RequestMethod.GET, value = "/transfers/{hash}")
   public JSONObject getTrnasferbyHash(
       @PathVariable String hash
@@ -50,7 +89,6 @@ public class TransferController {
       return null;
     }
     Map map = new HashMap();
-
     map.put("transaction", queryResult.get(0));
     return new JSONObject(map);
   }
