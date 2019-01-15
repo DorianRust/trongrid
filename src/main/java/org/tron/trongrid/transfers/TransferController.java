@@ -54,7 +54,7 @@ public class TransferController {
       /******************* Page Parameters ****************************************************/
       @RequestParam(value = "limit", required = false, defaultValue = "40") int limit,
       @RequestParam(value = "count", required = false, defaultValue = "true") boolean count,
-      @RequestParam(value = "sort", required = false, defaultValue = "-timestamp") String sort,
+      @RequestParam(value = "sort", required = false, defaultValue = "-timeStamp") String sort,
       @RequestParam(value = "start", required = false, defaultValue = "0") Long start,
       @RequestParam(value = "total", required = false, defaultValue = "0") Long total,
       /****************** Filter parameters *****************************************************/

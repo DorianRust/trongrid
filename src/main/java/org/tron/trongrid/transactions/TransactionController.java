@@ -40,7 +40,7 @@ public class TransactionController {
       /******************* Page Parameters ****************************************************/
       @RequestParam(value = "limit", required = false, defaultValue = "40") int limit,
       @RequestParam(value = "count", required = false, defaultValue = "true") boolean count,
-      @RequestParam(value = "sort", required = false, defaultValue = "-timestamp") String sort,
+      @RequestParam(value = "sort", required = false, defaultValue = "-timeStamp") String sort,
       @RequestParam(value = "start", required = false, defaultValue = "0") int start,
       @RequestParam(value = "total", required = false, defaultValue = "0") Long total,
       /****************** Filter parameters *****************************************************/
@@ -80,8 +80,8 @@ public class TransactionController {
     return new JSONObject(map);
   }
 
-  private Pageable setPagniateVariable(long start, int size, String sort) {
-    int page = Math.max(0,(int) start / size);
+  private Pageable setPagniateVariable(int start, int size, String sort) {
+    int page = start;
     int pageSize = size;
     return QueryFactory.make_pagination(Math.max(0,page - 1),Math.min(200,pageSize),sort);
   }
