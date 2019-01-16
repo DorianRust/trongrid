@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.tron.trongrid.QueryFactory;
 import org.tron.trongrid.TransactionTriggerEntity;
 
@@ -51,7 +52,6 @@ public class TransferController {
       @RequestParam(value = "from", required = false, defaultValue = "") String from,
       @RequestParam(value = "to", required = false, defaultValue = "") String to,
       @RequestParam(value = "token", required = false, defaultValue = "") String token
-
   ) {
     QueryFactory query = new QueryFactory();
     query.setTransferType();
