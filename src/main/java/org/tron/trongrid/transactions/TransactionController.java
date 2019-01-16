@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -22,9 +21,6 @@ import org.tron.trongrid.TransactionTriggerEntity;
 @Component
 @PropertySource("classpath:tronscan.properties")
 public class TransactionController {
-  @Value("${url.transaction}")
-  private String url;
-
   @Autowired(required = false)
   MongoTemplate mongoTemplate;
 
