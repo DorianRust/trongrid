@@ -159,7 +159,7 @@ public class EventLogController {
     query.setEventName(eventName);
 
     if (blockNumber != -1) {
-      query.setBlockNumGte(blockNumber);
+      query.setBlockNum(blockNumber);
     }
 
     List<ContractEventTriggerEntity> result = mongoTemplate.find(query.getQuery(),
